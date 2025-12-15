@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Enrollments - Student Course Management</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fa;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 2rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .header h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .nav {
+      margin-top: 1rem;
+    }
+
+    .nav a,
+    .logout-btn {
+      color: white;
+      text-decoration: none;
+      margin-right: 1.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      transition: background 0.3s;
+      border: none;
+      font-size: 1rem;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-block;
+    }
+
+    .nav a:hover,
+    .logout-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .enrollments-list {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .enrollment-item {
+      padding: 1.5rem;
+      border-bottom: 1px solid #f0f0f0;
+      transition: background 0.3s;
+    }
+
+    .enrollment-item:last-child {
+      border-bottom: none;
+    }
+
+    .enrollment-item:hover {
+      background: #f9f9f9;
+    }
+
+    .course-id {
+      color: #667eea;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .enrollment-date {
+      color: #999;
+      font-size: 0.9rem;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #999;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📖 My Enrollments</h1>
+      <p>Track your enrolled courses</p>
+      <div class="nav">
+        <a th:href="@{/student/courses}">Browse Courses</a>
+        <form th:action="@{/logout}" method="post" style="display: inline;">
+          <button type="submit" class="logout-btn">Logout</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="enrollments-list" th:if="${enrollments != null and !enrollments.empty}">
+      <div class="enrollment-item" th:each="enrollment : ${enrollments}">
+        <p class="course-id">Course ID: <span th:text="${enrollment.courseId}">1</span></p>
+        <p class="enrollment-date">Enrolled on: <span th:text="${enrollment.enrolledAt}">2024-01-01</span></p>
+      </div>
+    </div>
+
+    <div class="empty-state" th:if="${enrollments == null or enrollments.empty}">
+      <h2>You haven't enrolled in any courses yet</h2>
+      <p><a th:href="@{/student/courses}" style="color: #667eea; text-decoration: none; font-weight: 600;">Browse
+          available courses</a></p>
+    </div>
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Available Courses - Student Course Management</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fa;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 2rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .header h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .nav {
+      margin-top: 1rem;
+    }
+
+    .nav a,
+    .logout-btn {
+      color: white;
+      text-decoration: none;
+      margin-right: 1.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      transition: background 0.3s;
+      border: none;
+      font-size: 1rem;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-block;
+    }
+
+    .nav a:hover,
+    .logout-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .course-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .course-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .course-card.ai-recommended {
+      border: 2px solid #667eea;
+      background: linear-gradient(to bottom, #f8f9ff 0%, white 100%);
+    }
+
+    .course-title {
+      font-size: 1.3rem;
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+
+    .course-info {
+      color: #666;
+      margin-bottom: 0.5rem;
+    }
+
+    .course-duration {
+      color: #667eea;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .ai-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .ai-explanation {
+      background: #f0f4ff;
+      padding: 0.75rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      color: #555;
+      border-left: 3px solid #667eea;
+    }
+
+    .relevance-score {
+      display: inline-block;
+      background: #ffd700;
+      color: #333;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+
+    .enroll-btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .enroll-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #999;
+    }
+
+    .search-container {
+      margin-bottom: 2rem;
+    }
+
+    .search-form {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 300px;
+      padding: 0.875rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .search-btn,
+    .ai-search-btn {
+      padding: 0.875rem 1.5rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .ai-search-btn {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .search-btn:hover,
+    .ai-search-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .ai-search-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .clear-btn {
+      padding: 0.875rem 1.5rem;
+      background: #f0f0f0;
+      color: #666;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+
+    .clear-btn:hover {
+      background: #e0e0e0;
+    }
+
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .loading-overlay.active {
+      display: flex;
+    }
+
+    .loading-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .ai-summary {
+      background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      border-left: 4px solid #667eea;
+    }
+
+    .ai-summary h3 {
+      color: #667eea;
+      margin-bottom: 0.5rem;
+    }
+
+    .error-message {
+      background: #fee;
+      color: #c33;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      border-left: 4px solid #c33;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📚 Available Courses</h1>
+      <p>Explore and enroll in courses to enhance your skills</p>
+      <div class="nav">
+        <a th:href="@{/student/syllabus}">📖 Syllabus Explorer</a>
+        <a th:href="@{/student/colleges}">📍 College Locator</a>
+        <a th:href="@{/student/my-enrollments}">My Enrollments</a>
+        <form th:action="@{/logout}" method="post" style="display: inline;">
+          <button type="submit" class="logout-btn">Logout</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="search-container">
+      <form th:action="@{/student/courses}" method="get" class="search-form">
+        <input type="text" name="search" id="searchInput" th:value="${search}"
+          placeholder="Search courses by title, description, or instructor..." class="search-input" />
+        <button type="submit" class="search-btn">🔍 Search</button>
+        <button type="button" class="ai-search-btn" id="aiSearchBtn">✨ AI Search</button>
+        <a th:href="@{/student/courses}" class="clear-btn" th:if="${search != null and !search.isEmpty()}">Clear</a>
+      </form>
+    </div>
+
+    <div id="aiSummaryContainer"></div>
+    <div id="errorContainer"></div>
+
+    <div class="courses-grid" id="coursesGrid" th:if="${courses != null and !courses.empty}">
+      <div class="course-card" th:each="course : ${courses}" th:attr="data-course-id=${course.id}">
+        <h3 class="course-title" th:text="${course.title}">Course Title</h3>
+        <p class="course-info" th:text="${course.description}">Course description</p>
+        <p class="course-info"><strong>Instructor:</strong> <span th:text="${course.instructor}">Instructor Name</span>
+        </p>
+        <p class="course-duration" th:text="${course.durationHours} + ' hours'">Duration</p>
+        <form th:action="@{'/student/enroll/' + ${course.id}}" method="post" style="display: inline;">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+          <button type="submit" class="enroll-btn" style="border: none; cursor: pointer;">Enroll Now</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="empty-state" th:if="${courses == null or courses.empty}">
+      <h2>No courses available at the moment</h2>
+      <p>Please check back later</p>
+    </div>
+  </div>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content">
+      <div class="spinner"></div>
+      <p>AI is analyzing your query...</p>
+    </div>
+  </div>
+
+  <script th:inline="javascript">
+    const aiSearchBtn = document.getElementById('aiSearchBtn');
+    const searchInput = document.getElementById('searchInput');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const coursesGrid = document.getElementById('coursesGrid');
+    const aiSummaryContainer = document.getElementById('aiSummaryContainer');
+    const errorContainer = document.getElementById('errorContainer');
+    const csrfToken = /*[[${_csrf.token}]]*/ '';
+    const csrfHeader = /*[[${_csrf.headerName}]]*/ '';
+
+    aiSearchBtn.addEventListener('click', async () => {
+      const query = searchInput.value.trim();
+      if (!query) {
+        alert('Please enter a search query');
+        return;
+      }
+
+      // Show loading
+      loadingOverlay.classList.add('active');
+      aiSearchBtn.disabled = true;
+      errorContainer.innerHTML = '';
+      aiSummaryContainer.innerHTML = '';
+
+      try {
+        const response = await fetch('/student/courses/ai-search?query=' + encodeURIComponent(query), {
+          method: 'POST',
+          headers: {
+            [csrfHeader]: csrfToken
+          }
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+          errorContainer.innerHTML = `<div class="error-message">❌ ${data.error}</div>`;
+          return;
+        }
+
+        // Display AI summary
+        if (data.summary) {
+          aiSummaryContainer.innerHTML = `
+            <div class="ai-summary">
+              <h3>🤖 AI Recommendations</h3>
+              <p>${data.summary}</p>
+            </div>
+          `;
+        }
+
+        // Hide all courses first
+        const allCourseCards = document.querySelectorAll('.course-card');
+        allCourseCards.forEach(card => {
+          card.style.display = 'none';
+          card.classList.remove('ai-recommended');
+          // Remove any existing AI elements
+          const existingBadge = card.querySelector('.ai-badge');
+          const existingExplanation = card.querySelector('.ai-explanation');
+          if (existingBadge) existingBadge.remove();
+          if (existingExplanation) existingExplanation.remove();
+        });
+
+        // Show and enhance recommended courses
+        if (data.recommendations && data.recommendations.length > 0) {
+          data.recommendations.forEach(rec => {
+            const courseCard = document.querySelector(`[data-course-id="${rec.courseId}"]`);
+            if (courseCard) {
+              courseCard.style.display = 'block';
+              courseCard.classList.add('ai-recommended');
+
+              // Add AI badge and explanation
+              const title = courseCard.querySelector('.course-title');
+              const badge = document.createElement('div');
+              badge.className = 'ai-badge';
+              badge.innerHTML = `✨ AI Recommended <span class="relevance-score">⭐ ${rec.relevanceScore}/10</span>`;
+              title.parentNode.insertBefore(badge, title);
+
+              const explanation = document.createElement('div');
+              explanation.className = 'ai-explanation';
+              explanation.innerHTML = `<strong>Why this course:</strong> ${rec.explanation}`;
+              const duration = courseCard.querySelector('.course-duration');
+              duration.parentNode.insertBefore(explanation, duration);
+            }
+          });
+        } else {
+          errorContainer.innerHTML = `<div class="error-message">No courses match your query. Try a different search term.</div>`;
+        }
+
+      } catch (error) {
+        errorContainer.innerHTML = `<div class="error-message">❌ Error: ${error.message}</div>`;
+      } finally {
+        loadingOverlay.classList.remove('active');
+        aiSearchBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+
+</html>

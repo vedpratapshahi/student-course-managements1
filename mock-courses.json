@@ -1,0 +1,7 @@
+{
+  "courses": [
+    { "id": 1, "name": "Java Basics", "duration": "5 weeks" },
+    { "id": 2, "name": "Spring Boot", "duration": "6 weeks" },
+    { "id": 3, "name": "Web Development", "duration": "8 weeks" }
+  ]
+}
